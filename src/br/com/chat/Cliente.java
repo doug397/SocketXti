@@ -12,15 +12,38 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class Cliente extends JFrame {
 	
 	 Socket socket;
 	 PrintWriter escritor;
-	 
 	 JTextField textoParaEnviar;
 	 String nome;
+	 JTextArea textoRecebido;
+	 Scanner leitor;
+	 
+	 
+	 private class EscutaServidor implements Runnable{
+		 
+		@Override
+		public void run() {
+			
+			try{
+			String texto;
+				while((texto=leitor.nextLine()) !=null){
+					textoRecebido.append(texto+"\n");
+				}
+			
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+		}
+		 
+	 }
 	 
 	 public Cliente(String nome){
 		 super("Chat :" +nome);
@@ -40,13 +63,18 @@ public class Cliente extends JFrame {
 		 envio.setLayout(new BorderLayout());
 		 envio.add(BorderLayout.CENTER, textoParaEnviar);
 		 envio.add(BorderLayout.EAST,botao);
+		
+		 
+		 textoRecebido= new JTextArea();
+		 textoRecebido.setFont(fonte);
+		 JScrollPane scroll= new JScrollPane(textoRecebido);
+		 
+		 getContentPane().add(BorderLayout.CENTER, scroll);
 		 getContentPane().add(BorderLayout.SOUTH, envio);
-		 
-		 
 		 configurarRede();
 		 
 		 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		 setSize(500,90);
+		 setSize(500,500);
 		 setVisible(true);
 		 
 		
@@ -68,6 +96,8 @@ public class Cliente extends JFrame {
 		try{
 		 socket= new Socket("127.0.0.1",5002);
 		 escritor=new PrintWriter(socket.getOutputStream());
+		 leitor= new Scanner(socket.getInputStream());
+		 new Thread (new EscutaServidor()).start();
 		}catch (Exception e) {
 			
 		}
