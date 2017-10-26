@@ -11,7 +11,7 @@ public class ConselhoServidor {
 	
 		ServerSocket server= new ServerSocket(5000);
 		
-		while(true){
+		 while(true){
 		  Socket socket=server.accept();
 		  
 		  // Envia uma Mensagem
